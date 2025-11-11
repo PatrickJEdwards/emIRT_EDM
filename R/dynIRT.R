@@ -24,6 +24,7 @@ dynIRT <- function(.data,
                  .starts$alpha,
                  .starts$beta,
                  .starts$x,
+                 .starts$p, # (N x T) matrix of propensity starting values
                  .data$rc,
                  .data$startlegis,
                  .data$endlegis,
@@ -34,6 +35,8 @@ dynIRT <- function(.data,
                  .priors$beta.mu,
                  .priors$beta.sigma,
                  .priors$omega2,
+                 .priors$p.mu,    # (N x T) matrix of propensity prior mean values (Generally just set == 0)
+                 .priors$p.sigma, # (1 x 1) matrix that sets prior variance number for all propensity parameters (generally just set == 1)
                  ifelse(!is.null(.control$threads), .control$threads, default$threads),
                  ifelse(!is.null(.control$verbose), .control$verbose, default$verbose),
                  ifelse(!is.null(.control$maxit), .control$maxit, default$maxit),

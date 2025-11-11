@@ -7,10 +7,12 @@
 
 int checkConv_dynIRT(const arma::mat &oldEx,
               const arma::mat &curEx,
-			  const arma::mat &oldEb,
+			        const arma::mat &oldEb,
               const arma::mat &curEb,
-			  const arma::mat &oldEa,
+			        const arma::mat &oldEa,
               const arma::mat &curEa,
+              const arma::mat &oldEp,   // NEW: propensities (previous)
+              const arma::mat &curEp,   // NEW: propensities (current)
               double thresh,
               int convtype
                );

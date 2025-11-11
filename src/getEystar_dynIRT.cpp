@@ -8,13 +8,14 @@ using namespace Rcpp;
 
 // // [[Rcpp::export()]]
 void getEystar_dynIRT(arma::mat &Eystar,
-					const arma::mat &alpha,
-                    const arma::mat &beta,
-                    const arma::mat &x,
-                    const arma::mat &y,
-                    const arma::mat &bill_session,
-                    const arma::mat &startlegis,
-                    const arma::mat &endlegis,
+					          const arma::mat &alpha,        // J x 1
+                    const arma::mat &beta,         // J x 1
+                    const arma::mat &x,            // N x T
+                    const arma::mat &p,            // N x T  (p)   <-- NEW
+                    const arma::mat &y,            // N x J  (1 / -1 / 0)
+                    const arma::mat &bill_session, // J x 1 (0..T-1)
+                    const arma::mat &startlegis,   // N x 1
+                    const arma::mat &endlegis,     // N x 1
                     const int N,
                     const int J
                     ) {
@@ -30,7 +31,8 @@ void getEystar_dynIRT(arma::mat &Eystar,
 
 			if( (bill_session(j,0) <= endlegis(i,0)) && (bill_session(j,0) >= startlegis(i,0)) ){
 
-		    	q1 = alpha(j,0) + x(i,bill_session(j,0)) * beta(j,0);
+			    // ONLY CHANGE: add p(i, bill_session(j,0)) to the latent mean
+		    	q1 = p(i, bill_session(j,0)) + alpha(j,0) + x(i,bill_session(j,0)) * beta(j,0);
 
 //			    if(y(i,j)==1)     Eystar(i,j) = RcppTN::etn1(q1, 1.0, 0.0, R_PosInf);
 //			    if(y(i,j)==-1)    Eystar(i,j) = RcppTN::etn1(q1, 1.0, R_NegInf, 0.0);

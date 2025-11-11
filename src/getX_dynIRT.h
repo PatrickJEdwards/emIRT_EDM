@@ -18,7 +18,8 @@ void getX_dynIRT(arma::mat &Ex,
                 const arma::mat &xsigma0,
                 const int T,
                 const int N,
-                const arma::mat &end_session
+                const arma::mat &end_session,
+                const arma::mat &Ep                       // <-- NEW
                 );
 
 #endif

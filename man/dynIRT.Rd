@@ -40,6 +40,8 @@
       legislator and columns indicating the session.  Although not strictly necessary, it is generally good practice here to
       set the start values for legislators who are not serving in a particular session to 0, as that is what the point estimate for
       them will return.}
+    \item{\code{p}}{ An (N x T) matrix of starting values for the respondent propensities \eqn{p_{it}}, with rows indicating the legislator
+      and columns indicating the session. These sould generally be set to 0 unless you have strong priors or rotational invariance rears its ugly head.}
     }
   }
   \item{.priors}{  list, containing several matrices of starting values for the parameters. The
@@ -51,6 +53,12 @@
     \item{\code{beta.mu}}{  A (2 x 1) prior means matrix for all bill parameters \eqn{\alpha_j} and \eqn{\beta_j}.}
     \item{\code{beta.sigma}}{  A (2 x 2) prior covariance matrix for all bill parameters \eqn{\alpha_j} and \eqn{\beta_j}.}
     \item{\code{omega2}}{  A (N x 1) matrix with the evolutionary variance for each legislator \eqn{\omega^2_{ix}}.}
+    \item{\code{p.mu}}{A single real number of prior mean value for respondent propensities \eqn{p_{it}}. Generally just set 
+      all values to be 0 unless you have strong priors or rotational invariance rears its ugly head.}
+    %\item{\code{p.mu}}{An (N x T) matrix of prior mean values for respondent propensities \eqn{p_{it}}, with rows indicating the legislator
+    %  and columns indicating the session. Generally just set all values to be 0 unless you ahve strong priors or rotational invariance rears its ugly head.)}
+    \item{\code{p.sigma}}{A single real number that sets prior variance number for all propensity parameters. Generally just set 
+      all values to be 0 unless you have strong priors or rotational invariance rears its ugly head.}
      }
   }
   \item{.control}{  list, specifying some control functions for estimation.  Options include the following:

@@ -8,6 +8,8 @@ are also included.  The details about the methods implemented in this package ar
 described in Imai, Lo, and Olmsted. (2016). "[Fast Estimation of Ideal Points with Massive Data.](https://imai.fas.harvard.edu/research/fastideal.html)" *American Political Science Review*, 
 Vol. 110, No. 4 (December), pp. 631-656.
 
+MODIFIED BY PATRICK EDWARDS to quickly estimate EDM ideal point model akin to Kellermann (2012)
+
 The current release of the R package is available on
 [CRAN](https://cran.r-project.org/web/packages/emIRT/).
 

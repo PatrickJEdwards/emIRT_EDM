@@ -5,15 +5,16 @@
 
 #include <RcppArmadillo.h>
 
-void getEystar_dynIRT(arma::mat &Eystar,
-					const arma::mat &alpha,
-                    const arma::mat &beta,
-                    const arma::mat &x,
-                    const arma::mat &y,
-                    const arma::mat &bill_session,
-                    const arma::mat &startlegis,
-                    const arma::mat &endlegis,
-                    const int N,
+void getEystar_dynIRT(arma::mat &Eystar,           // N x J (filled)
+					          const arma::mat &alpha,        // J x 1  (alpha)
+                    const arma::mat &beta,         // J x 1  (beta)
+                    const arma::mat &x,            // N x T  (x)
+                    const arma::mat &p,            // N x T  (p)   <-- NEW
+                    const arma::mat &y,            // N x J  (observed {-1,0,1})
+                    const arma::mat &bill_session, // J x 1  (0..T-1)
+                    const arma::mat &startlegis,   // N x 1
+                    const arma::mat &endlegis,     // N x 1
+                    const int N, 
                     const int J
                     );
 

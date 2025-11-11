@@ -13,7 +13,8 @@ void getEb2_dynIRT(arma::mat &Eb2,
                  const arma::mat &mubeta,
                  const arma::mat &sigmabeta,
                  const arma::mat &ones_col,
-                 const int J
+                 const int J,
+                 const arma::mat &Ep           // NEW: N x T, E[p_it]
                  );
 
 #endif

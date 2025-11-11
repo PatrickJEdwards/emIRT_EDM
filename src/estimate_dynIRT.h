@@ -8,6 +8,7 @@
 Rcpp::List estimate_dynIRT(arma::mat alpha_start,
                     arma::mat beta_start,
                     arma::mat x_start,
+                    arma::mat p_start,     // matrix of propensity starting values
                     arma::mat y,
                     arma::mat startlegis,
                     arma::mat endlegis,
@@ -18,6 +19,8 @@ Rcpp::List estimate_dynIRT(arma::mat alpha_start,
                     arma::mat betamu,
                     arma::mat betasigma,
                     arma::mat omega2,
+                    double pmu = 0.0,             // propensity p_{it} prior mean value
+                    double psigma = 1.0,          // propensity p_{it} prior variance value
                     unsigned int threads = 1,
                     bool verbose = true,
                     unsigned int maxit = 2500,
