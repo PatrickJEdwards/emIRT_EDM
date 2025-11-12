@@ -173,6 +173,9 @@ List estimate_dynIRT(arma::mat alpha_start,
 	end_session = getLast_dynIRT(bill_session, T, nJ);
 	ones_col = getOnecol_dynIRT(startlegis, endlegis, T, nN);
 
+	// ... inside estimate_dynIRT(...) before the main while-loop:
+	bool header_printed = false;
+	
   // Main Loop Until Convergence
 	while (counter < maxit) {
 		
