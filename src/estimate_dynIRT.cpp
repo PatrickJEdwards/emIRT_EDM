@@ -197,23 +197,6 @@ List estimate_dynIRT(arma::mat alpha_start,
     if (!curEystar.is_finite()) Rcpp::stop("Eystar contains non-finite values after getEystar_dynIRT");
     
     
-    
-    // NEW: propensity update (non-dynamic, per-time sum-to-zero inside)
-    // Uses residuals r = E[y*] - E[alpha] - E[beta] E[x]
-    // Prior N(pmu, psigma); centers within each time period.
-    getP_dynIRT(
-      curEp, curVp,            // updated in place
-      curEystar,               // E[y*]
-      curEa, curEb, curEx,     // alpha, beta, x
-      bill_session,            // to know which items live in each t
-      startlegis, endlegis,
-      pmu, psigma,             // Prior mean and variance of propensity parameters 
-      T, nN, nJ
-    );
-    
-    // CHECK: ensure no NA/Inf slipped through 'getP_dynIRT(...)':
-    if (!curEp.is_finite()) Rcpp::stop("Ep contains non-finite values after getP_dynIRT");
-  
   
 		
 		// CHANGED: x-update uses de-propensitied pseudo-observations
@@ -235,8 +218,7 @@ List estimate_dynIRT(arma::mat alpha_start,
 		
 		getEx2x2_dynIRT(curEx2x2,curEx,curVx,legis_by_session,Nlegis_session,T);
     getVb2_dynIRT(curVb2, curEx2x2, betasigma, T);
-    	
-    	
+
     	
     // CHANGED: item update uses y^dagger = E[y*] - E[p]
     // New signature will accept curEp
@@ -261,6 +243,29 @@ List estimate_dynIRT(arma::mat alpha_start,
 		curEba = getEba_dynIRT(curEa,curEb,curVb2,bill_session,nJ);
 		curEbb = getEbb_dynIRT(curEb,curVb2,bill_session,nJ);
 
+		
+		
+		
+		// NEW: propensity update (non-dynamic, per-time sum-to-zero inside)
+		// Uses residuals r = E[y*] - E[alpha] - E[beta] E[x]
+		// Prior N(pmu, psigma); centers within each time period.
+		getP_dynIRT(
+		  curEp, curVp,            // updated in place
+		  curEystar,               // E[y*]
+		  curEa, curEb, curEx,     // alpha, beta, x
+		  bill_session,            // to know which items live in each t
+		  startlegis, endlegis,
+		  pmu, psigma,             // Prior mean and variance of propensity parameters 
+		  T, nN, nJ
+		);
+		
+		// CHECK: ensure no NA/Inf slipped through 'getP_dynIRT(...)':
+		if (!curEp.is_finite()) Rcpp::stop("Ep contains non-finite values after getP_dynIRT");
+		
+		
+		
+		
+		
 		
 		
 		

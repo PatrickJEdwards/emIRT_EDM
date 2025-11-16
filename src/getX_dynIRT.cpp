@@ -19,16 +19,16 @@ void getX_dynIRT(arma::mat &Ex,
                  const int T,
                  const int N,
                  const arma::mat &end_session,  // T×1, end indices per time block in {items j}
-                 const arma::mat &p             // NEW: N×T, E[p_{it}]
+                 const arma::mat &Ep             // NEW: N×T, E[p_{it}]
                  ) {
 
 
 	int i, t;
 
   // ===== Precomputed per-time aggregates over items =====
-  arma::mat betaDD(T,1,arma::fill::zeros);  // 𝛽̈_t  = sqrt( Σ_j E[β_{jt}^2] )
-  arma::mat Eba_sum(T,1,arma::fill::zeros); // Σ_j E[β_{jt} α_{jt}]
-  arma::mat Eb_sum(T,1,arma::fill::zeros);  // NEW: Σ_j E[β_{jt}]   (needed for − p_{it} * Σ_j E[β_{jt}])
+  arma::mat betaDD( T,1,arma::fill::zeros);  // 𝛽̈_t  = sqrt( Σ_j E[β_{jt}^2] )
+  arma::mat Eba_sum(T,1,arma::fill::zeros);  // Σ_j E[β_{jt} α_{jt}]
+  arma::mat Eb_sum( T,1,arma::fill::zeros);  // NEW: Σ_j E[β_{jt}]   (needed for − p_{it} * Σ_j E[β_{jt}])
 
   // ===== Per-(i,t) temporary slices =====
   arma::mat Eby_sum, Eb_t, Eystar_t;        // Eby_sum = (Eystar_t * Eb_t) = Σ_j E[y*_{ijt}] E[β_{jt}]
@@ -48,9 +48,9 @@ void getX_dynIRT(arma::mat &Ex,
 	// betaDD and Eba_sum were already used; we add Eb_sum to capture Σ_j E[β_{jt}] so we can subtract p_{it} times this quantity.
 	// These quantities are called repeatedly, calculate and store for reuse
 	//betaDD and yDD correspond to beta.dot.dot and y.dot.dot respectively
-	betaDD(0,0)  = sqrt( accu(Ebb.submat(0,0,                end_session(0,0)-1,0)) );     // 𝛽̈_0
-	Eba_sum(0,0) =       accu(Eba.submat(0,0,                end_session(0,0)-1,0));       // Σ_j E[β α] at t=0
-	Eb_sum(0,0)  =       accu(Eb .submat(0,0,                end_session(0,0)-1,0));       // NEW: Σ_j E[β] at t=0
+	betaDD(0,0)  = sqrt(accu(Ebb.submat(0,0, end_session(0,0)-1,0)));     // 𝛽̈_0
+	Eba_sum(0,0) =      accu(Eba.submat(0,0, end_session(0,0)-1,0));       // Σ_j E[β α] at t=0
+	Eb_sum(0,0)  =      accu(Eb.submat(0,0,  end_session(0,0)-1,0));       // NEW: Σ_j E[β] at t=0
 	
 	
 	if(T > 1){
@@ -81,15 +81,16 @@ void getX_dynIRT(arma::mat &Ex,
 		}
 
 		// Σ_j E[y*_{ijt}] E[β_{jt}]
-		Eby_sum = Eystar_t * Eb_t;
+		//Eby_sum = Eystar_t * Eb_t;
+		arma::rowvec ydagger_t = Eystar_t - Ep(i,t);   // broadcast scalar p_it
+		Eby_sum = ydagger_t * Eb_t;                    // scalar
 		
 		// ====== THE KEY CHANGE (p enters ẏ̈_{it}) ======
 		// Original: ẏ̈_{it} = [ Σ_j E[y*]E[β]  −  Σ_j E[β α] ] / 𝛽̈_t
 		// With propensities: subtract   p_{it} * Σ_j E[β_{jt}]   inside the numerator.
 		// This reflects  Σ_j E[β_{jt}] * (E[y*_{ijt}] − p_{it} − E[α_{jt}]).
-		yDD = ( Eby_sum(0,0)
-            - p(i,t) * Eb_sum(t,0)   // NEW: subtract p_{it} Σ_j E[β_{jt}]
-            - Eba_sum(t,0) ) / betaDD(t,0);  // ẏ̈_{it}
+		//yDD = ( Eby_sum(0,0) - Ep(i,t) * Eb_sum(t,0) - Eba_sum(t,0) ) / betaDD(t,0); 
+		yDD     = ( Eby_sum(0,0) - Eba_sum(t,0) ) / betaDD(t,0);
 		
 		// ---- Kalman filter update at entry period ----
 		Ot(i,t)    = omega2(i,0) + xsigma0(i,0);                 // Ω_t = ω_i^2 + C_{i0}
@@ -117,13 +118,13 @@ void getX_dynIRT(arma::mat &Ex,
 			  Eystar_t = Eystar.submat(i, end_session(t-1,0), i, end_session(t,0)-1);
 			  Eb_t     = Eb    .submat(    end_session(t-1,0), 0, end_session(t,0)-1, 0);
 			  
-			  Eby_sum = Eystar_t * Eb_t;                       // Σ_j E[y*]E[β] at time t
-			  
+			  //Eby_sum = Eystar_t * Eb_t;                       // Σ_j E[y*]E[β] at time t
+			  arma::rowvec ydagger_t = Eystar_t - Ep(i,t);   // broadcast scalar p_it
+			  Eby_sum = ydagger_t * Eb_t;                    // scalar
 			  
 			  // NEW: again subtract p_{it} Σ_j E[β_{jt}] before dividing by 𝛽̈_t
-			  yDD = ( Eby_sum(0,0)
-               - p(i,t) * Eb_sum(t,0)   // NEW: − p_{it} Σ_j E[β_{jt}]
-               - Eba_sum(t,0) ) / betaDD(t,0);          // ẏ̈_{it}
+			  //yDD = ( Eby_sum(0,0) - Ep(i,t) * Eb_sum(t,0) - Eba_sum(t,0) ) / betaDD(t,0);
+			  yDD     = ( Eby_sum(0,0) - Eba_sum(t,0) ) / betaDD(t,0);
                
         Ot(i,t)    = omega2(i,0) + C_var(i,t-1);         // Ω_t = ω_i^2 + C_{t-1}
         St(i,t)    = betaDD(t,0)*betaDD(t,0)*Ot(i,t) + 1;// S_t = 𝛽̈_t^2 Ω_t + 1
