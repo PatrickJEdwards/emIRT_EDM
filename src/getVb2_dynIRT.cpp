@@ -6,7 +6,7 @@ using namespace Rcpp;
 
 // // [[Rcpp::export()]]
 void getVb2_dynIRT(arma::cube &Vb2,
-				 const arma::cube &Ex2x2,
+				         const arma::cube &Ex2x2,
                  const arma::mat &sigma,
                  const int T
                  ) {
